@@ -19,7 +19,7 @@ class Comment(models.Model):
     text = models.TextField(validators=[validate_comment_text])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    reply = models.ForeignKey(
+    parent = models.ForeignKey(
         to="self",
         blank=True,
         null=True,
