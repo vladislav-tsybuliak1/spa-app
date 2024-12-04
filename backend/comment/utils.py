@@ -10,3 +10,11 @@ def comment_image_file_path(comment, filename) -> str:
         f"{slugify(comment.created_at)}-{uuid.uuid4()}{extension}"
     )
     return os.path.join("uploads/comments/images/", filename)
+
+
+def comment_text_file_path(comment, filename) -> str:
+    _, extension = os.path.splitext(filename)
+    filename = (
+        f"{slugify(comment.created_at)}-{uuid.uuid4()}{extension}"
+    )
+    return os.path.join("uploads/comments/files/", filename)
