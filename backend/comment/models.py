@@ -23,7 +23,7 @@ class Comment(models.Model):
         to="self",
         blank=True,
         null=True,
-        on_delete=CASCADE,
+        on_delete=models.CASCADE,
         related_name="replies",
     )
 
