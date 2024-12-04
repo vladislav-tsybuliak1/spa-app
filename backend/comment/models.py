@@ -3,8 +3,8 @@ from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.db import models
 
-from comment.utils import comment_image_file_path
-from comment.validators import validate_comment_text
+from comment.utils import comment_image_file_path, comment_text_file_path
+from comment.validators import validate_comment_text, validate_file_size
 
 
 class Comment(models.Model):
@@ -30,6 +30,17 @@ class Comment(models.Model):
                 ]
             )
         ],
+    )
+    attached_fild = models.FileField(
+        blank=True,
+        null=True,
+        upload_to=comment_text_file_path,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=["txt"]
+            ),
+            validate_file_size,
+        ]
     )
     parent = models.ForeignKey(
         to="self",
