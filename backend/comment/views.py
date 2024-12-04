@@ -19,4 +19,4 @@ class CommentView(generics.ListCreateAPIView):
         return CommentListSerializer
 
     def get_queryset(self) -> QuerySet:
-        return self.queryset.filter(reply=None)
+        return self.queryset.filter(parent=None)

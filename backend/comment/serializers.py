@@ -6,14 +6,19 @@ from comment.models import Comment
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = [
+        fields = (
             "id",
             "user",
             "text",
             "created_at",
             "updated_at",
-            "reply",
-        ]
+            "parent",
+        )
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+        )
 
 
 class CommentCreateSerializer(CommentSerializer):
@@ -21,8 +26,18 @@ class CommentCreateSerializer(CommentSerializer):
 
 
 class CommentListSerializer(CommentSerializer):
-    reply = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
 
-    def get_reply(self, obj):
-        replies = Comment.objects.filter(reply=obj)
+    class Meta(CommentSerializer.Meta):
+        fields = (
+            "id",
+            "user",
+            "text",
+            "created_at",
+            "updated_at",
+            "replies"
+        )
+
+    def get_replies(self, obj):
+        replies = Comment.objects.filter(parent=obj)
         return CommentListSerializer(replies, many=True).data
