@@ -1,3 +1,4 @@
+from PIL import Image
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -40,3 +41,13 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ("-created_at",)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.attached_image:
+            self.resize_image()
+
+    def resize_image(self):
+        img = Image.open(self.attached_image.path)
+        img.thumbnail((320, 240))
+        img.save(self.attached_image.path)
