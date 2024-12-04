@@ -31,7 +31,7 @@ class Comment(models.Model):
             )
         ],
     )
-    attached_field = models.FileField(
+    attached_file = models.FileField(
         blank=True,
         null=True,
         upload_to=comment_text_file_path,
