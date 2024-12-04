@@ -46,6 +46,6 @@ class CommentListSerializer(CommentSerializer):
             "replies"
         )
 
-    def get_replies(self, obj):
-        replies = Comment.objects.filter(parent=obj)
+    def get_replies(self, comment):
+        replies = comment.replies.all()
         return CommentListSerializer(replies, many=True).data
