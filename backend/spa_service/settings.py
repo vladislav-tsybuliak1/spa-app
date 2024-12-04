@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # custom
     "user",
+    "comment",
 ]
 
 MIDDLEWARE = [
