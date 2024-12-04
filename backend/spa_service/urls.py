@@ -30,6 +30,7 @@ urlpatterns = [
         "api/v1/comments/",
         include("comment.urls", namespace="comment-api")
     ),
+    path('captcha/', include("captcha.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
