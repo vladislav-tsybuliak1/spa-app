@@ -60,5 +60,6 @@ class Comment(models.Model):
 
     def resize_image(self):
         img = Image.open(self.attached_image.path)
-        img.thumbnail((320, 240))
-        img.save(self.attached_image.path)
+        if img.width > 320 or img.height > 240:
+            img.thumbnail((320, 240))
+            img.save(self.attached_image.path)
