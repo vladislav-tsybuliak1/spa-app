@@ -24,4 +24,8 @@ urlpatterns = [
         "api/v1/users/",
         include("user.urls", namespace="user-api")
     ),
+    path(
+        "api/v1/comments/",
+        include("comment.urls", namespace="comment-api")
+    ),
 ]
