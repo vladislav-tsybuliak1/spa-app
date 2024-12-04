@@ -14,3 +14,15 @@ class CommentSerializer(serializers.ModelSerializer):
             "updated_at",
             "reply",
         ]
+
+
+class CommentCreateSerializer(CommentSerializer):
+    pass
+
+
+class CommentListSerializer(CommentSerializer):
+    reply = serializers.SerializerMethodField()
+
+    def get_reply(self, obj):
+        replies = Comment.objects.filter(reply=obj)
+        return CommentListSerializer(replies, many=True).data
