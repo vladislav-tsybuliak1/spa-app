@@ -10,6 +10,7 @@ ALLOWED_TAGS = {
     "p": [],
 }
 
+
 def validate_comment_text(value: str) -> str:
     parsed = html.fromstring(value)
 
@@ -22,3 +23,11 @@ def validate_comment_text(value: str) -> str:
 
     valid_html = html.tostring(parsed, encoding="unicode")
     return valid_html
+
+
+def validate_file_size(file) -> None:
+    filesize = file.size
+    max_upload_size = 100 * 1024
+
+    if filesize > max_upload_size:
+        raise ValidationError("The file size should be less than 100 KB")
