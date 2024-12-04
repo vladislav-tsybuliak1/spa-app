@@ -6,7 +6,8 @@ ALLOWED_TAGS = {
     "a": ["href", "title"],
     "code": [],
     "i": [],
-    "strong": []
+    "strong": [],
+    "p": [],
 }
 
 def validate_comment_text(value: str) -> str:
