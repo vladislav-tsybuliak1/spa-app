@@ -28,6 +28,8 @@ export default {
       totalPages: 0,
       nextPageUrl: null,
       prevPageUrl: null,
+      orderBy: 'created_at',
+      orderDirection: 'asc',
     };
   },
   computed: {
@@ -38,9 +40,13 @@ export default {
   methods: {
     async fetchComments(url = `${import.meta.env.VITE_API_URL}/api/v1/comments/`) {
       try {
+        const ordering = `${this.orderDirection === 'desc' ? '-' : ''}${this.orderBy}`;
         const response = await axios.get(url, {
           headers: {
             Authorization: `Bearer ${this.token}`,
+          },
+          params: {
+            ordering,
           },
         });
         this.comments = response.data.results;
@@ -229,43 +235,67 @@ export default {
 
 <template>
   <div v-if="!token" class="auth-warning">
-      <p>You must <a href="/login/"> login</a> to view or post comments.</p>
-    </div>
+    <p>You must <a href="/login/"> login</a> to view or post comments.</p>
+  </div>
 
   <div v-else class="comment-wrapper">
     <div class="comment-header">
-      <h2>Comments</h2>
-      <button @click="toggleCommentForm">Write a comment</button>
+      <div>
+        <h2>Comments</h2>
+        <button @click="toggleCommentForm">Write a comment</button>
+      </div>
       <button @click="logOut">Logout</button>
     </div>
+
+    <div class="ordering-pagination">
+
       <div class="pagination-controls">
         <button
-          :disabled="!prevPageUrl"
-          @click="fetchComments(prevPageUrl)">
+            :disabled="!prevPageUrl"
+            @click="fetchComments(prevPageUrl)">
           Previous
         </button>
         <span>Page {{ currentPage }} of {{ totalPages }}</span>
         <button
-          :disabled="!nextPageUrl"
-          @click="fetchComments(nextPageUrl)">
+            :disabled="!nextPageUrl"
+            @click="fetchComments(nextPageUrl)">
           Next
         </button>
       </div>
 
-      <!-- List of Comments -->
-      <div v-if="comments" class="comment-list">
-        <comment-item
-            v-for="comment in comments"
-            :key="comment.id"
-            :comment="comment"
-            @showEmail="showEmail"
-            @showHomePage="showHomePage"
-            @replyToComment="replyToComment"
-        />
+      <div class="ordering-controls">
+        <label for="orderBy">Order By:</label>
+        <select id="orderBy" v-model="orderBy" @change="fetchComments()">
+          <option value="user__username">Username</option>
+          <option value="user__email">Email</option>
+          <option value="created_at">Date Created</option>
+        </select>
+
+        <label for="orderDirection">Direction:</label>
+        <select id="orderDirection" v-model="orderDirection"
+                @change="fetchComments()">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
       </div>
-      <p v-else class="no-comments">No comments yet. Be the first to
-        comment!
-      </p>
+
+    </div>
+
+
+    <!-- List of Comments -->
+    <div v-if="comments" class="comment-list">
+      <comment-item
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+          @showEmail="showEmail"
+          @showHomePage="showHomePage"
+          @replyToComment="replyToComment"
+      />
+    </div>
+    <p v-else class="no-comments">No comments yet. Be the first to
+      comment!
+    </p>
   </div>
 
   <div v-if="isCommentFormVisible" class="show-window">
@@ -385,6 +415,7 @@ export default {
 .comment-header button {
   background-color: #ffffff;
   color: #2d2d2d;
+  margin-left: 15px;
   border: 1px solid #2d2d2d;
   border-radius: 5px;
   padding: 8px 12px;
@@ -398,6 +429,10 @@ export default {
   color: #ffffff;
 }
 
+.comment-header div {
+  display: flex;
+}
+
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -408,6 +443,7 @@ export default {
 .pagination-controls button {
   margin: 0 10px;
   padding: 5px 15px;
+  font-size: 18px;
   border: none;
   background-color: #007bff;
   color: white;
@@ -421,7 +457,33 @@ export default {
 }
 
 .pagination-controls span {
-  font-size: 16px;
+  font-size: 18px;
+}
+
+.ordering-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 15px;
+}
+
+.ordering-controls select {
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.ordering-controls label {
+  font-size: 18px;
+  padding: 5px 10px;
+}
+
+.ordering-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
 }
 
 textarea {
