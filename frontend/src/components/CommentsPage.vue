@@ -11,6 +11,8 @@ export default {
       commentAttachedFile: null,
       commentParent: null,
       comments: [],
+      chosenComment: null,
+      isEmailShown: false,
       errorMessage: null,
       successMessage: null,
     };
@@ -65,6 +67,14 @@ export default {
         this.errorMessage = error.response?.data?.detail || 'Failed to post comment.';
       }
     },
+    showEmail(comment) {
+      this.isEmailShown = true;
+      this.chosenComment = comment;
+    },
+    closeWindow() {
+      this.isEmailShown = false;
+      this.chosenComment = null;
+    },
   },
   mounted() {
     if (this.token) {
@@ -98,23 +108,36 @@ export default {
             v-for="comment in comments"
             :key="comment.id"
             class="comment-item"
-
+            @showEmail="showEmail"
         >
           <p class="comment-user">{{ comment.user.username }}</p>
           <p class="comment-text" v-html="sanitizeHTML(comment.text)"></p>
           <p class="comment-date">{{ new Date(comment.created_at).toLocaleString() }}</p>
+          <div class="footer-buttons">
+            <button @click="showEmail(comment)">Email</button>
+          </div>
         </div>
       </div>
       <p v-else class="no-comments">No comments yet. Be the first to
         comment!</p>
     </div>
   </div>
+
+  <div v-if="isEmailShown" class="show-window">
+      <div class="show-window-content">
+        <h3>{{ chosenComment.user.username }} email:</h3>
+        <p>{{ chosenComment.user.email }}</p>
+        <button @click="closeWindow" class="close-btn">X</button>
+      </div>
+    </div>
+
+
 </template>
 
 <style scoped>
 .comment-wrapper {
   width: 80vi;
-  margin: 0 auto;
+  margin: 20px auto;
   background: #1f0f24;
   color: wheat;
   padding: 20px;
@@ -154,6 +177,70 @@ export default {
 
 .comment-text{
   color: white;
+}
+
+.footer-buttons {
+  display: flex;
+  margin-top: 10px;
+}
+
+.footer-buttons button {
+  background-color: #6a0dad;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.footer-buttons button:hover {
+  background-color: #8b5ed4;
+}
+
+.show-window {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.show-window-content {
+  background-color: #2a2a2a;
+  color: wheat;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: wheat;
+  border: 2px solid wheat;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.close-btn:hover {
+  background-color: wheat;
+  color: #2a2a2a;
 }
 
 </style>
