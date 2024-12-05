@@ -64,7 +64,7 @@ export default {
     </div>
 
     <!-- Attached File -->
-    <div v-if="comment.attached_file && isChild" class="attached-file">
+    <div v-if="comment.attached_file" class="attached-file">
       <a :href="getMediaUrl(comment.attached_file)" target="_blank">
         Attached file
       </a>
