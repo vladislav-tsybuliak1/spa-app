@@ -35,20 +35,19 @@ export default {
         this.confirmPassword = '';
       } catch (error) {
         if (error.response && error.response.data) {
-        const errors = error.response.data;
-
-        if (errors.username) {
+          const errors = error.response.data;
+          if (errors.username) {
             this.errorMessage += 'Username: ' + errors.username.join(', ') + ' ';
-        }
-        if (errors.email) {
+          }
+          if (errors.email) {
             this.errorMessage += 'Email: ' + errors.email.join(', ') + ' ';
-        }
-        if (errors.password) {
+          }
+          if (errors.password) {
             this.errorMessage += 'Password: ' + errors.password.join(', ');
+          }
+        } else {
+          this.errorMessage = 'An error occurred! Please try again later.';
         }
-    } else {
-        this.errorMessage = 'An error occurred! Please try again later.';
-    }
       }
     }
   }

@@ -10,13 +10,14 @@ export default {
       commentHomePage: '',
       commentAttachedImage: null,
       commentAttachedFile: null,
-      commentParent: null,
       comments: [],
       chosenComment: null,
       isEmailShown: false,
       isHomePageShown: false,
+      isCommentFormVisible: false,
       errorMessage: null,
       successMessage: null,
+      attachedFilePreview: '',
     };
   },
   computed: {
@@ -44,26 +45,54 @@ export default {
         return;
       }
       try {
+        const formData = new FormData();
+        formData.append('text', this.commentText);
+        if (this.commentHomePage) {
+          formData.append('home_page', this.commentHomePage);
+        }
+        if (this.commentAttachedImage) {
+          formData.append('attached_image', this.commentAttachedImage);
+        }
+        if (this.commentAttachedFile) {
+          formData.append('attached_file', this.commentAttachedFile);
+        }
+        if (this.chosenComment) {
+          formData.append('parent', this.chosenComment);
+        }
         const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/api/v1/comments/`,
-            {text: this.commentText},
+            formData,
             {
               headers: {
                 Authorization: `Bearer ${this.token}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data'
               },
             }
         );
 
         await this.fetchComments();
-        this.commentText = '';
-        this.commentHomePage = '';
-        this.commentAttachedImage = null;
-        this.commentAttachedFile = null;
+        this.resetCommentAttr();
         this.errorMessage = '';
         this.successMessage = 'Comment posted successfully!';
       } catch (error) {
-        this.errorMessage = error.response?.data?.detail || 'Failed to post comment.';
+        if (error.response && error.response.data) {
+          const errors = error.response.data;
+          if (errors.text) {
+            this.errorMessage += 'Text: ' + errors.text.join(', ') + ' ';
+          }
+          if (errors.home_page) {
+            this.errorMessage += 'Home page: ' + errors.home_page.join(', ') + ' ';
+          }
+          if (errors.attached_image) {
+            this.errorMessage += 'Image: ' + errors.attached_image.join(', ') + ' ';
+          }
+          if (errors.attached_file) {
+            this.errorMessage += 'File: ' + errors.attached_file.join(', ') + ' ';
+          }
+          if (errors.parent) {
+            this.errorMessage += 'Comment: ' + errors.parent.join(', ') + ' ';
+          }
+        }
       }
     },
     showEmail(comment) {
@@ -74,10 +103,50 @@ export default {
       this.isHomePageShown = true;
       this.chosenComment = comment;
     },
+    resetCommentAttr() {
+      this.commentText = '';
+      this.commentHomePage = '';
+      this.commentAttachedImage = null;
+      this.commentAttachedFile = null;
+      this.chosenComment = null;
+    },
     closeWindow() {
+      this.resetCommentAttr();
       this.isEmailShown = false;
       this.isHomePageShown = false;
-      this.chosenComment = null;
+      this.isCommentFormVisible = false;
+    },
+    clearSuccess() {
+      this.successMessage = '';
+      this.isCommentFormVisible = false;
+    },
+    clearError() {
+      this.errorMessage = '';
+    },
+    toggleCommentForm() {
+      this.isCommentFormVisible = true;
+    },
+    onImageChange(event) {
+      const image = event.target.files[0];
+      if (image) {
+        this.commentAttachedImage = image;
+        console.log("Image" + this.commentAttachedImage)
+        console.log("File" + this.commentAttachedFile)
+        this.attachedFilePreview = URL.createObjectURL(image);
+      }
+    },
+    onFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.commentAttachedFile = file;
+        console.log(this.commentAttachedFile)
+        console.log(this.commentAttachedImage)
+      }
+    },
+    clearAttachedFile() {
+      this.commentAttachedImage = null;
+      this.commentAttachedFile = null;
+      this.attachedFilePreview = '';
     },
   },
   mounted() {
@@ -90,21 +159,16 @@ export default {
 
 <template>
   <div class="comment-wrapper">
-    <h2>Comments</h2>
+    <div class="comment-header">
+      <h2>Comments</h2>
+      <button @click="toggleCommentForm">Write a comment</button>
+    </div>
 
-    <!-- Show a warning if the user is not authenticated -->
     <div v-if="!token" class="auth-warning">
       <p>You must <a href="/login/"> login</a> to view or post comments.</p>
     </div>
 
-    <!-- Show the comment form and comments if authenticated -->
     <div v-else>
-
-      <!-- Error Message -->
-      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-
-      <!-- Success Message -->
-      <p v-if="successMessage" class="success">{{ successMessage }}</p>
 
       <!-- List of Comments -->
       <div v-if="comments" class="comment-list">
@@ -122,11 +186,56 @@ export default {
     </div>
   </div>
 
+  <div v-if="isCommentFormVisible" class="show-window">
+    <div class="show-window-content">
+      <textarea v-model="commentText" placeholder="Enter your text here..."
+                rows="8" cols="45"></textarea>
+      <input type="url" v-model="commentHomePage"
+             placeholder="Enter your home page (optional)"/>
+
+      <input type="file" @change="onImageChange" accept="image/*"/>
+      <div v-if="commentAttachedImage">
+        <img :src="attachedFilePreview" alt="Attached file"
+             class="attached-file-preview"/>
+      </div>
+
+      <input type="file" @change="onFileChange" accept="text/plain"/>
+      <div v-if="commentAttachedFile">
+        <p class="attached-file-preview">{{ commentAttachedFile.name }}</p>
+      </div>
+
+      <div class="show-window-footer">
+        <button type="button" @click="clearAttachedFile" class="clear-btn">
+          Clear Attached File(s)
+        </button>
+
+        <button @click="addComment" class="add-comment-btn">Post Comment
+        </button>
+      </div>
+
+      <button @click="closeWindow" class="close-btn">X</button>
+    </div>
+  </div>
+
+  <div v-if="successMessage" class="show-window">
+    <div class="show-window-content">
+      <p class="success">{{ successMessage }}</p>
+      <button @click="clearSuccess()" class="close-btn">X</button>
+    </div>
+  </div>
+
+  <div v-if="errorMessage" class="show-window">
+    <div class="show-window-content">
+      <p class="error">{{ errorMessage }}</p>
+      <button @click="clearError()" class="close-btn">X</button>
+    </div>
+  </div>
+
   <div v-if="isEmailShown" class="show-window">
     <div class="show-window-content">
       <h3>{{ chosenComment.user.username }} email:</h3>
       <p>{{ chosenComment.user.email }}</p>
-      <button @click="closeWindow" class="close-btn">X</button>
+      <button @click="closeWindow()" class="close-btn">X</button>
     </div>
   </div>
 
@@ -135,7 +244,7 @@ export default {
       <h3>{{ chosenComment.user.username }} home page:</h3>
       <p v-if="chosenComment.home_page">{{ chosenComment.home_page }}</p>
       <p v-else>the user didn't provide a home page url</p>
-      <button @click="closeWindow" class="close-btn">X</button>
+      <button @click="closeWindow()" class="close-btn">X</button>
     </div>
   </div>
 
@@ -150,6 +259,59 @@ export default {
   color: #151513;
   padding: 20px;
   border-radius: 10px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f39c12;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header h2 {
+  margin: 0;
+  color: #2d2d2d;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.comment-header button {
+  background-color: #ffffff;
+  color: #2d2d2d;
+  border: 1px solid #2d2d2d;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.comment-header button:hover {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
+
+textarea {
+  width: 90%;
+  margin-bottom: 10px;
+}
+
+input[type="url"],
+input[type="file"] {
+  width: 85%;
+  margin-bottom: 10px;
+}
+
+.attached-file-preview {
+  max-width: 100%;
+  max-height: 100px;
+  display: block;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  text-align: left;
 }
 
 .auth-warning {
@@ -184,9 +346,9 @@ export default {
 .show-window-content {
   background-color: #2a2a2a;
   color: wheat;
-  padding: 20px;
+  padding: 30px 50px 20px 20px;
   border-radius: 10px;
-  width: 300px;
+  width: 400px;
   text-align: center;
   position: relative;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
@@ -210,6 +372,39 @@ export default {
 .close-btn:hover {
   background-color: wheat;
   color: #2a2a2a;
+}
+
+.show-window-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px;
+}
+
+.show-window-footer button {
+  border: 1px solid #2d2d2d;
+  border-radius: 5px;
+  padding: 8px 12px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.clear-btn {
+  background-color: #553703;
+  color: #ffffff;
+}
+
+.clear-btn:hover {
+  background-color: #976309;
+}
+
+.add-comment-btn {
+  background-color: #205e04;
+  color: #ffffff;
+}
+
+.add-comment-btn:hover {
+  background-color: #3cc106;
 }
 
 </style>
