@@ -13,12 +13,13 @@ export default {
       comments: [],
       chosenComment: null,
       isEmailShown: false,
+      isHomePageShown: false,
       errorMessage: null,
       successMessage: null,
     };
   },
   computed: {
-    token () {
+    token() {
       return localStorage.getItem('access_token');
     }
   },
@@ -71,8 +72,13 @@ export default {
       this.isEmailShown = true;
       this.chosenComment = comment;
     },
+    showHomePage(comment) {
+      this.isHomePageShown = true;
+      this.chosenComment = comment;
+    },
     closeWindow() {
       this.isEmailShown = false;
+      this.isHomePageShown = false;
       this.chosenComment = null;
     },
   },
@@ -109,12 +115,15 @@ export default {
             :key="comment.id"
             class="comment-item"
             @showEmail="showEmail"
+            @showHomePage="showHomePage"
         >
           <p class="comment-user">{{ comment.user.username }}</p>
           <p class="comment-text" v-html="sanitizeHTML(comment.text)"></p>
-          <p class="comment-date">{{ new Date(comment.created_at).toLocaleString() }}</p>
+          <p class="comment-date">
+            {{ new Date(comment.created_at).toLocaleString() }}</p>
           <div class="footer-buttons">
             <button @click="showEmail(comment)">Email</button>
+            <button @click="showHomePage(comment)">Home page</button>
           </div>
         </div>
       </div>
@@ -124,12 +133,21 @@ export default {
   </div>
 
   <div v-if="isEmailShown" class="show-window">
-      <div class="show-window-content">
-        <h3>{{ chosenComment.user.username }} email:</h3>
-        <p>{{ chosenComment.user.email }}</p>
-        <button @click="closeWindow" class="close-btn">X</button>
-      </div>
+    <div class="show-window-content">
+      <h3>{{ chosenComment.user.username }} email:</h3>
+      <p>{{ chosenComment.user.email }}</p>
+      <button @click="closeWindow" class="close-btn">X</button>
     </div>
+  </div>
+
+  <div v-if="isHomePageShown" class="show-window">
+    <div class="show-window-content">
+      <h3>{{ chosenComment.user.username }} home page:</h3>
+      <p v-if="chosenComment.home_page">{{ chosenComment.home_page }}</p>
+      <p v-else>the user didn't provide a home page url</p>
+      <button @click="closeWindow" class="close-btn">X</button>
+    </div>
+  </div>
 
 
 </template>
@@ -175,7 +193,7 @@ export default {
   color: #bbb;
 }
 
-.comment-text{
+.comment-text {
   color: white;
 }
 
@@ -188,6 +206,7 @@ export default {
   background-color: #6a0dad;
   color: #fff;
   border: none;
+  margin-right: 5px;
   padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
