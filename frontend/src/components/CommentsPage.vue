@@ -283,7 +283,7 @@ export default {
 
 
     <!-- List of Comments -->
-    <div v-if="comments" class="comment-list">
+    <div v-if="comments && comments.length > 0" class="comment-list">
       <comment-item
           v-for="comment in comments"
           :key="comment.id"
@@ -293,9 +293,11 @@ export default {
           @replyToComment="replyToComment"
       />
     </div>
-    <p v-else class="no-comments">No comments yet. Be the first to
-      comment!
-    </p>
+    <div v-else>
+      <p class="no-comments">No comments yet. Be the first to
+        comment!
+      </p>
+    </div>
   </div>
 
   <div v-if="isCommentFormVisible" class="show-window">
@@ -524,6 +526,8 @@ input[type="text"] {
 
 .no-comments {
   margin-top: 20px;
+  font-size: 30px;
+  text-align: center;
 }
 
 .comment-list {
