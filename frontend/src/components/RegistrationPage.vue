@@ -104,65 +104,12 @@ export default {
 
 <style scoped>
 
-.wrapper {
-  width: 400px;
-  margin: auto;
+.login-info {
   padding: 20px;
-  border-radius: 10px;
-  background-color: #1f0f24;
-  color: wheat;
-  text-align: center;
 }
 
-.wrapper h1 {
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin: 15px 0;
-}
-
-input {
-  width: 90%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-input:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.btn:disabled {
-  cursor: not-allowed;
-}
-
-.btn {
-  background-color: #007bff;
+.login-info a {
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 500ms ease;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-  transform: scale(1.1) translateY(-5px);
-}
-
-.error {
-  color: #ff4d4d;
-  margin-bottom: 10px;
-}
-
-.success {
-  color: #4caf50;
-  margin-bottom: 10px;
 }
 
 </style>
