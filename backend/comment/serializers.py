@@ -15,6 +15,7 @@ class CommentSerializer(serializers.ModelSerializer):
             "text",
             "created_at",
             "updated_at",
+            "home_page",
             "attached_image",
             "attached_file",
             "parent",
@@ -41,6 +42,7 @@ class CommentListSerializer(CommentSerializer):
             "text",
             "created_at",
             "updated_at",
+            "home_page",
             "attached_image",
             "attached_file",
             "replies"
