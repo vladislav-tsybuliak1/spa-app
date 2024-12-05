@@ -204,6 +204,11 @@ export default {
       this.commentAttachedFile = null;
       this.attachedFilePreview = '';
     },
+    logOut() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      this.$router.push('/login');
+    }
   },
   mounted() {
     if (this.token) {
@@ -215,17 +220,16 @@ export default {
 </script>
 
 <template>
-  <div class="comment-wrapper">
-    <div class="comment-header">
-      <h2>Comments</h2>
-      <button @click="toggleCommentForm">Write a comment</button>
-    </div>
-
-    <div v-if="!token" class="auth-warning">
+  <div v-if="!token" class="auth-warning">
       <p>You must <a href="/login/"> login</a> to view or post comments.</p>
     </div>
 
-    <div v-else>
+  <div v-else class="comment-wrapper">
+    <div class="comment-header">
+      <h2>Comments</h2>
+      <button @click="toggleCommentForm">Write a comment</button>
+      <button @click="logOut">Logout</button>
+    </div>
 
       <!-- List of Comments -->
       <div v-if="comments" class="comment-list">
@@ -241,7 +245,6 @@ export default {
       <p v-else class="no-comments">No comments yet. Be the first to
         comment!
       </p>
-    </div>
   </div>
 
   <div v-if="isCommentFormVisible" class="show-window">
@@ -397,6 +400,8 @@ input[type="text"] {
 
 .auth-warning {
   text-align: center;
+  padding: 30px;
+  color: orangered;
 }
 
 .auth-warning a {
