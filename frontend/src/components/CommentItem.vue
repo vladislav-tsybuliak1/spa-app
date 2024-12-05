@@ -10,6 +10,7 @@ export default {
     isChild: {
       type: Boolean,
       default: false,
+      required: true,
     },
   },
   data() {
@@ -19,11 +20,11 @@ export default {
     };
   },
   methods: {
-    showEmail() {
-      this.$emit('showEmail', this.comment);
+    showEmail(comment) {
+      this.$emit('showEmail', comment);
     },
-    showHomePage() {
-      this.$emit('showHomePage', this.comment);
+    showHomePage(comment) {
+      this.$emit('showHomePage', comment);
     },
     sanitizeHTML(html) {
       return DOMPurify.sanitize(html);
