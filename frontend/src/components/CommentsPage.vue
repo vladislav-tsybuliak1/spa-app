@@ -24,6 +24,10 @@ export default {
       },
       captchaResponse: '',
       isCaptchaVerified: false,
+      currentPage: 1,
+      totalPages: 0,
+      nextPageUrl: null,
+      prevPageUrl: null,
     };
   },
   computed: {
@@ -32,14 +36,18 @@ export default {
     }
   },
   methods: {
-    async fetchComments() {
+    async fetchComments(url = `${import.meta.env.VITE_API_URL}/api/v1/comments/`) {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/comments/`, {
+        const response = await axios.get(url, {
           headers: {
             Authorization: `Bearer ${this.token}`,
           },
         });
-        this.comments = response.data;
+        this.comments = response.data.results;
+        this.totalPages = response.data.pages;
+        this.nextPageUrl = response.data.next;
+        this.prevPageUrl = response.data.previous;
+        this.currentPage = new URL(url).searchParams.get('page') || 1;
       } catch (error) {
         this.errorMessage = 'Failed to load comments.';
         console.error(error.response.data);
@@ -230,6 +238,19 @@ export default {
       <button @click="toggleCommentForm">Write a comment</button>
       <button @click="logOut">Logout</button>
     </div>
+      <div class="pagination-controls">
+        <button
+          :disabled="!prevPageUrl"
+          @click="fetchComments(prevPageUrl)">
+          Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button
+          :disabled="!nextPageUrl"
+          @click="fetchComments(nextPageUrl)">
+          Next
+        </button>
+      </div>
 
       <!-- List of Comments -->
       <div v-if="comments" class="comment-list">
@@ -375,6 +396,32 @@ export default {
 .comment-header button:hover {
   background-color: #2d2d2d;
   color: #ffffff;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-controls button {
+  margin: 0 10px;
+  padding: 5px 15px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  font-size: 16px;
 }
 
 textarea {
