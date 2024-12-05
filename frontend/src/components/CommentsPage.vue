@@ -1,8 +1,9 @@
 <script>
 import axios from 'axios';
-import DOMPurify from 'dompurify';
+import CommentItem from './CommentItem.vue';
 
 export default {
+  components: {CommentItem},
   data() {
     return {
       commentText: '',
@@ -24,9 +25,6 @@ export default {
     }
   },
   methods: {
-    sanitizeHTML(html) {
-      return DOMPurify.sanitize(html);
-    },
     async fetchComments() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/comments/`, {
@@ -95,7 +93,7 @@ export default {
     <h2>Comments</h2>
 
     <!-- Show a warning if the user is not authenticated -->
-    <div v-if="!this.token" class="auth-warning">
+    <div v-if="!token" class="auth-warning">
       <p>You must <a href="/login/"> login</a> to view or post comments.</p>
     </div>
 
@@ -109,46 +107,18 @@ export default {
       <p v-if="successMessage" class="success">{{ successMessage }}</p>
 
       <!-- List of Comments -->
-      <div v-if="this.comments" class="comment-list">
-        <div
+      <div v-if="comments" class="comment-list">
+        <comment-item
             v-for="comment in comments"
             :key="comment.id"
-            class="comment-item"
+            :comment="comment"
             @showEmail="showEmail"
             @showHomePage="showHomePage"
-        >
-          <div class="comment-header">
-            <p class="comment-user">
-              {{ comment.user.username }}
-            <span class="comment-date">
-              at {{ new Date(comment.created_at).toLocaleString() }}
-            </span>
-            </p>
-
-          </div>
-
-          <p class="comment-text" v-html="sanitizeHTML(comment.text)"></p>
-
-          <!-- Attached Image -->
-          <div v-if="comment.attached_image" class="attached-image">
-            <img :src="comment.attached_image" alt="Attached Image" />
-          </div>
-
-          <!-- Attached File -->
-          <div v-if="comment.attached_file" class="attached-file">
-            <a :href="comment.attached_file" target="_blank">
-              Attached file
-            </a>
-          </div>
-
-          <div class="footer-buttons">
-            <button @click="showEmail(comment)">Email</button>
-            <button @click="showHomePage(comment)">Home page</button>
-          </div>
-        </div>
+        />
       </div>
       <p v-else class="no-comments">No comments yet. Be the first to
-        comment!</p>
+        comment!
+      </p>
     </div>
   </div>
 
@@ -177,8 +147,7 @@ export default {
 .comment-wrapper {
   width: 80vi;
   margin: 20px auto;
-  background: #1f0f24;
-  color: wheat;
+  color: #151513;
   padding: 20px;
   border-radius: 10px;
 }
@@ -197,69 +166,6 @@ export default {
 
 .comment-list {
   margin-top: 20px;
-}
-
-.comment-item {
-  border-bottom: 1px solid #ccc;
-  padding: 10px 0;
-}
-
-.comment-header {
-  display: flex;
-  font-size: 0.9em
-}
-
-.comment-user {
-  font-weight: bold;
-}
-
-.comment-date {
-  color: #bbb;
-  font-weight: lighter;
-}
-
-.attached-image img {
-  max-width: 100%;
-  height: auto;
-  margin-top: 10px;
-  border-radius: 5px;
-}
-
-.attached-file a {
-  display: inline-block;
-  margin-top: 10px;
-  color: #6a0dad;
-  text-decoration: underline;
-  font-size: 0.9em;
-}
-
-.attached-file a:hover {
-  color: #8b5ed4;
-}
-
-.comment-text {
-  color: white;
-}
-
-.footer-buttons {
-  display: flex;
-  margin-top: 10px;
-}
-
-.footer-buttons button {
-  background-color: #6a0dad;
-  color: #fff;
-  border: none;
-  margin-right: 5px;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9em;
-  transition: background-color 0.3s ease;
-}
-
-.footer-buttons button:hover {
-  background-color: #8b5ed4;
 }
 
 .show-window {
