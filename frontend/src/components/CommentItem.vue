@@ -10,7 +10,6 @@ export default {
     isChild: {
       type: Boolean,
       default: false,
-      required: true,
     },
   },
   data() {

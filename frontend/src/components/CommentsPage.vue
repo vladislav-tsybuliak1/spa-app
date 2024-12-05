@@ -18,6 +18,12 @@ export default {
       errorMessage: null,
       successMessage: null,
       attachedFilePreview: '',
+      captcha: {
+        key: '',
+        imageUrl: '',
+      },
+      captchaResponse: '',
+      isCaptchaVerified: false,
     };
   },
   computed: {
@@ -44,6 +50,12 @@ export default {
         this.errorMessage = 'Comment text cannot be empty!';
         return;
       }
+
+      await this.validateCaptcha();
+      if (!this.isCaptchaVerified) {
+        return;
+      }
+
       try {
         const formData = new FormData();
         formData.append('text', this.commentText);
@@ -71,6 +83,7 @@ export default {
         );
 
         await this.fetchComments();
+        await this.refreshCaptcha();
         this.resetCommentAttr();
         this.errorMessage = '';
         this.successMessage = 'Comment posted successfully!';
@@ -94,6 +107,45 @@ export default {
           }
         }
       }
+    },
+    async fetchCaptcha() {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/get-captcha/`);
+        this.captcha.key = response.data.key;
+        this.captcha.imageUrl = response.data.image_url;
+      } catch (error) {
+        console.error('Error fetching CAPTCHA:', error);
+      }
+    },
+    async refreshCaptcha() {
+      await this.fetchCaptcha();
+      this.captchaResponse = '';
+      this.isCaptchaVerified = false;
+    },
+    async validateCaptcha() {
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/validate-captcha/`,
+            {
+              captcha_0: this.captcha.key,
+              captcha_1: this.captchaResponse,
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${this.token}`,
+              }
+            }
+        );
+        this.isCaptchaVerified = true;
+      } catch (error) {
+        if (error.response && error.response.data) {
+          this.errorMessage = error.response.data.captcha
+        } else {
+          this.errorMessage = 'An error occurred! Please try again later.';
+        }
+      }
+    },
+    getCaptchaImageUrl() {
+      return `${import.meta.env.VITE_API_URL}` + this.captcha.imageUrl
     },
     showEmail(comment) {
       this.isEmailShown = true;
@@ -157,6 +209,7 @@ export default {
     if (this.token) {
       this.fetchComments();
     }
+    this.refreshCaptcha();
   },
 };
 </script>
@@ -205,16 +258,31 @@ export default {
       <input type="url" v-model="commentHomePage"
              placeholder="Enter your home page (optional)"/>
 
+      <p class="file-label">Choose image file (optional):</p>
       <input type="file" @change="onImageChange" accept="image/*"/>
       <div v-if="commentAttachedImage">
         <img :src="attachedFilePreview" alt="Attached file"
              class="attached-file-preview"/>
       </div>
 
+      <p class="file-label">Choose .txt file (optional):</p>
       <input type="file" @change="onFileChange" accept="text/plain"/>
       <div v-if="commentAttachedFile">
         <p class="attached-file-preview">{{ commentAttachedFile.name }}</p>
       </div>
+
+      <div class="captcha">
+        <img :src="getCaptchaImageUrl()" alt="Captcha"/>
+        <button class="captcha-refresh-btn" @click="refreshCaptcha">Refresh
+          CAPTCHA
+        </button>
+      </div>
+      <input
+          v-model="captchaResponse"
+          type="text"
+          placeholder="Enter CAPTCHA text"
+          required
+      />
 
       <div class="show-window-footer">
         <button type="button" @click="clearAttachedFile" class="clear-btn">
@@ -312,7 +380,8 @@ textarea {
 }
 
 input[type="url"],
-input[type="file"] {
+input[type="file"],
+input[type="text"] {
   width: 85%;
   margin-bottom: 10px;
 }
@@ -332,6 +401,11 @@ input[type="file"] {
 
 .auth-warning a {
   color: white;
+}
+
+.file-label {
+  text-align: left;
+  margin-left: 25px;
 }
 
 .no-comments {
@@ -398,12 +472,28 @@ input[type="file"] {
   margin: 20px;
 }
 
+.captcha {
+  display: flex;
+  margin: 20px;
+}
+
+.captcha-refresh-btn,
 .show-window-footer button {
   border: 1px solid #2d2d2d;
   border-radius: 5px;
   padding: 8px 12px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+}
+
+.captcha-refresh-btn {
+  background-color: #005e7a;
+  color: white;
+  margin-left: 10px;
+}
+
+.captcha-refresh-btn:hover {
+  background-color: #138baf;
 }
 
 .clear-btn {
