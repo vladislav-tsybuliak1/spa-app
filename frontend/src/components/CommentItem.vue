@@ -7,11 +7,15 @@ export default {
       type: Object,
       required: true,
     },
+    isChild: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       imageModalVisible: false,
-      imageModalSrc: ''
+      imageModalSrc: '',
     };
   },
   methods: {
@@ -29,9 +33,13 @@ export default {
       this.imageModalVisible = true;
     },
     getMediaUrl(path) {
-      const baseUrl = `${import.meta.env.VITE_API_URL}`; // Set your backend base URL here
-      return `${baseUrl}${path}`;
-    }
+      if (this.isChild) {
+        const baseUrl = `${import.meta.env.VITE_API_URL}`;
+        return `${baseUrl}${path}`;
+      } else {
+        return path;
+      }
+    },
   },
 };
 </script>
@@ -50,12 +58,13 @@ export default {
     <p class="comment-text" v-html="sanitizeHTML(comment.text)"></p>
 
     <!-- Attached Image -->
-    <div v-if="comment.attached_image" class="attached-image" @click="showImageModal(getMediaUrl(comment.attached_image))">
+    <div v-if="comment.attached_image" class="attached-image"
+         @click="showImageModal(getMediaUrl(comment.attached_image))">
       <img :src="getMediaUrl(comment.attached_image)" alt="Attached Image"/>
     </div>
 
     <!-- Attached File -->
-    <div v-if="comment.attached_file" class="attached-file">
+    <div v-if="comment.attached_file && isChild" class="attached-file">
       <a :href="getMediaUrl(comment.attached_file)" target="_blank">
         Attached file
       </a>
@@ -73,15 +82,17 @@ export default {
           v-for="childReply in comment.replies"
           :key="childReply.id"
           :comment="childReply"
+          :isChild="true"
           @showEmail="showEmail"
           @showHomePage="showHomePage"
       />
     </div>
 
     <!-- Image Modal -->
-    <div v-if="imageModalVisible" class="image-modal" @click="imageModalVisible = false">
+    <div v-if="imageModalVisible" class="image-modal"
+         @click="imageModalVisible = false">
       <div class="image-modal-content">
-        <img :src="imageModalSrc" alt="Modal Image" />
+        <img :src="imageModalSrc" alt="Modal Image"/>
       </div>
     </div>
 
