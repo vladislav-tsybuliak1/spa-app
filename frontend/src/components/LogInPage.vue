@@ -22,17 +22,17 @@ methods: {
         );
 
 
-        localStorage.setItem("access_token", response.data.access);
-        localStorage.setItem("refresh_token", response.data.refresh);
+        localStorage.setItem('access_token', response.data.access);
+        localStorage.setItem('refresh_token', response.data.refresh);
 
-        this.successMessage = "Login successful!";
+        this.successMessage = 'Login successful!';
 
-        this.$router.push("/comments/");
+        this.$router.push('/comments/');
       } catch (error) {
         if (error.response && error.response.data) {
-          this.errorMessage = error.response.data.detail || "Login failed!";
+          this.errorMessage = error.response.data.detail || 'Login failed!';
         } else {
-          this.errorMessage = "An error occurred. Please try again.";
+          this.errorMessage = 'An error occurred. Please try again.';
         }
       }
     },
