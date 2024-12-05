@@ -25,11 +25,21 @@ SECRET_KEY = "django-insecure-vp$$!s)b-@0fn#frddu3c21yk(6+25c67*(d6u*ad(m6&cvthr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
 
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CSRF_COOKIE_HTTPONLY = False
 
 # Application definition
 
