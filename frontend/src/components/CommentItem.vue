@@ -26,6 +26,9 @@ export default {
     showHomePage(comment) {
       this.$emit('showHomePage', comment);
     },
+    replyToComment(comment) {
+      this.$emit('replyToComment', comment);
+    },
     sanitizeHTML(html) {
       return DOMPurify.sanitize(html);
     },
@@ -49,10 +52,7 @@ export default {
   <div class="comment-item">
     <div class="comment-header">
       <p class="comment-user">
-        {{ comment.user.username }}
-        <span class="comment-date">
-              at {{ new Date(comment.created_at).toLocaleString() }}
-            </span>
+        {{ comment.user.username }}<span class="comment-date">at {{ new Date(comment.created_at).toLocaleString() }}</span>
       </p>
     </div>
 
@@ -74,6 +74,7 @@ export default {
     <div class="footer-buttons">
       <button @click="showEmail(comment)">Email</button>
       <button @click="showHomePage(comment)">Home page</button>
+      <button @click="replyToComment(comment)">Reply</button>
     </div>
 
 
@@ -86,6 +87,7 @@ export default {
           :isChild="true"
           @showEmail="showEmail"
           @showHomePage="showHomePage"
+          @replyToComment="replyToComment"
       />
     </div>
 

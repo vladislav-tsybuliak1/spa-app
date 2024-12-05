@@ -57,7 +57,7 @@ export default {
           formData.append('attached_file', this.commentAttachedFile);
         }
         if (this.chosenComment) {
-          formData.append('parent', this.chosenComment);
+          formData.append('parent', this.chosenComment.id);
         }
         const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/api/v1/comments/`,
@@ -102,6 +102,10 @@ export default {
     showHomePage(comment) {
       this.isHomePageShown = true;
       this.chosenComment = comment;
+    },
+    replyToComment(comment) {
+      this.chosenComment = comment;
+      this.toggleCommentForm()
     },
     resetCommentAttr() {
       this.commentText = '';
@@ -178,6 +182,7 @@ export default {
             :comment="comment"
             @showEmail="showEmail"
             @showHomePage="showHomePage"
+            @replyToComment="replyToComment"
         />
       </div>
       <p v-else class="no-comments">No comments yet. Be the first to
@@ -188,6 +193,13 @@ export default {
 
   <div v-if="isCommentFormVisible" class="show-window">
     <div class="show-window-content">
+      <div class="show-window-header">
+        <p v-if="chosenComment">
+          Replying to <strong>{{ chosenComment.user.username }}</strong>
+        </p>
+        <p v-else>Create a new comment</p>
+      </div>
+
       <textarea v-model="commentText" placeholder="Enter your text here..."
                 rows="8" cols="45"></textarea>
       <input type="url" v-model="commentHomePage"
@@ -352,6 +364,11 @@ input[type="file"] {
   text-align: center;
   position: relative;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.show-window-header {
+  margin-bottom: 20px;
+  font-size: 25px;
 }
 
 .close-btn {
