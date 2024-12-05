@@ -20,6 +20,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from comment.captcha_views import get_captcha, validate_captcha
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
@@ -30,7 +32,9 @@ urlpatterns = [
         "api/v1/comments/",
         include("comment.urls", namespace="comment-api")
     ),
-    path('captcha/', include("captcha.urls")),
+    path("api/v1/get-captcha/", get_captcha, name="get-captcha"),
+    path("api/v1/validate-captcha/", validate_captcha, name="validate-captcha"),
+    path("captcha/", include("captcha.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
