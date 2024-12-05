@@ -117,10 +117,30 @@ export default {
             @showEmail="showEmail"
             @showHomePage="showHomePage"
         >
-          <p class="comment-user">{{ comment.user.username }}</p>
+          <div class="comment-header">
+            <p class="comment-user">
+              {{ comment.user.username }}
+            <span class="comment-date">
+              at {{ new Date(comment.created_at).toLocaleString() }}
+            </span>
+            </p>
+
+          </div>
+
           <p class="comment-text" v-html="sanitizeHTML(comment.text)"></p>
-          <p class="comment-date">
-            {{ new Date(comment.created_at).toLocaleString() }}</p>
+
+          <!-- Attached Image -->
+          <div v-if="comment.attached_image" class="attached-image">
+            <img :src="comment.attached_image" alt="Attached Image" />
+          </div>
+
+          <!-- Attached File -->
+          <div v-if="comment.attached_file" class="attached-file">
+            <a :href="comment.attached_file" target="_blank">
+              Attached file
+            </a>
+          </div>
+
           <div class="footer-buttons">
             <button @click="showEmail(comment)">Email</button>
             <button @click="showHomePage(comment)">Home page</button>
@@ -153,6 +173,7 @@ export default {
 </template>
 
 <style scoped>
+
 .comment-wrapper {
   width: 80vi;
   margin: 20px auto;
@@ -161,7 +182,6 @@ export default {
   padding: 20px;
   border-radius: 10px;
 }
-
 
 .auth-warning {
   text-align: center;
@@ -184,13 +204,37 @@ export default {
   padding: 10px 0;
 }
 
+.comment-header {
+  display: flex;
+  font-size: 0.9em
+}
+
 .comment-user {
   font-weight: bold;
 }
 
 .comment-date {
-  font-size: 0.9em;
   color: #bbb;
+  font-weight: lighter;
+}
+
+.attached-image img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.attached-file a {
+  display: inline-block;
+  margin-top: 10px;
+  color: #6a0dad;
+  text-decoration: underline;
+  font-size: 0.9em;
+}
+
+.attached-file a:hover {
+  color: #8b5ed4;
 }
 
 .comment-text {
