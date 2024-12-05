@@ -99,6 +99,12 @@ export default {
       </button>
       <button class="btn" v-else disabled>Fill all the fields</button>
     </form>
+
+    <div class="login-info">
+      <p><a href="/login/">Log in</a> if you are registered already</p>
+
+    </div>
+
   </div>
 </template>
 
