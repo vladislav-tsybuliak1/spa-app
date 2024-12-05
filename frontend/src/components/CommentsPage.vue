@@ -29,7 +29,7 @@ export default {
       nextPageUrl: null,
       prevPageUrl: null,
       orderBy: 'created_at',
-      orderDirection: 'asc',
+      orderDirection: 'desc',
     };
   },
   computed: {
