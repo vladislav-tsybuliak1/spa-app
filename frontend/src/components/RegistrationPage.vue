@@ -29,6 +29,10 @@ export default {
           password: this.password
         });
         this.successMessage = "Registration successful! You can now log in."
+        this.username = ''
+        this.email = ''
+        this.password = ''
+        this.confirmPassword = ''
       } catch (error) {
         if (error.response && error.response.data) {
         const errors = error.response.data;
