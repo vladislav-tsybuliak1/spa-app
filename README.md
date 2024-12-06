@@ -72,19 +72,10 @@ The **SPA-app API** is a DjangoRestFramework- and vue.js-based project for manag
     docker-compose up
     ```
 
-3. **Start Frontend APP**:
-   (in a new terminal)
-    
-   ```bash
-    cd frontend
-    npm install
-    npm run dev
-    ```
-
 ## **Access the app**
 
    - The API will be available at `http://localhost:8000/`.
-   - The vue.js frontend will be available at `http://localhost:5173/`.
+   - The vue.js frontend will be available at `http://localhost:8080/`.
 
 ## Contact
 For any inquiries, please contact [vladislav.tsybuliak@gmail.com](mailto:vladislav.tsybuliak@gmail.com).
