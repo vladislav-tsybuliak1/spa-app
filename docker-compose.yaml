@@ -26,6 +26,20 @@ services:
     volumes:
       - my_db:/var/lib/postgresql/data
 
+  spa_service_frontend:
+    build:
+      context: ./frontend
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - spa_service_backend
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    ports:
+      - "8080:8080"
+
 volumes:
   my_db:
   my_media:
+  node_modules:
