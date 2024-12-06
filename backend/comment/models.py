@@ -53,12 +53,12 @@ class Comment(models.Model):
     class Meta:
         ordering = ("-created_at",)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         super().save(*args, **kwargs)
         if self.attached_image:
             self.resize_image()
 
-    def resize_image(self):
+    def resize_image(self) -> None:
         img = Image.open(self.attached_image.path)
         if img.width > 320 or img.height > 240:
             img.thumbnail((320, 240))
