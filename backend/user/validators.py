@@ -8,5 +8,5 @@ def validate_username(username: str) -> None:
         raise ValidationError(
             f"{username} contains invalid characters. Only letters and digits are allowed."
         )
-    if len(username) <= 5:
-        raise ValidationError("Too short username. It should be at least 5 characters.")
+    if len(username) <= 3:
+        raise ValidationError("Too short username. It should be at least 3 characters.")
