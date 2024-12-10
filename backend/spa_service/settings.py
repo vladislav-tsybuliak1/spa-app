@@ -190,5 +190,5 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:8080",
-    "https://spa-app-backend.onrender.com",
+    "https://spa-app-frontend.onrender.com",
 ]
