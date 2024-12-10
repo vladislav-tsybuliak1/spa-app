@@ -56,7 +56,6 @@ export default {
         this.currentPage = new URL(url).searchParams.get('page') || 1;
       } catch (error) {
         this.errorMessage = 'Failed to load comments.';
-        console.error(error.response.data);
       }
     },
     async addComment() {
@@ -128,7 +127,6 @@ export default {
         this.captcha.key = response.data.key;
         this.captcha.imageUrl = response.data.image_url;
       } catch (error) {
-        console.error('Error fetching CAPTCHA:', error);
       }
     },
     async refreshCaptcha() {
@@ -200,8 +198,6 @@ export default {
       const image = event.target.files[0];
       if (image) {
         this.commentAttachedImage = image;
-        console.log("Image" + this.commentAttachedImage)
-        console.log("File" + this.commentAttachedFile)
         this.attachedFilePreview = URL.createObjectURL(image);
       }
     },
@@ -209,8 +205,6 @@ export default {
       const file = event.target.files[0];
       if (file) {
         this.commentAttachedFile = file;
-        console.log(this.commentAttachedFile)
-        console.log(this.commentAttachedImage)
       }
     },
     clearAttachedFile() {
